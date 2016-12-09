@@ -1,7 +1,20 @@
 <resources>
     <string name="app_name">Guppy</string>
-    <string name="welcome_message">Welcome to Guppy!</string>
-    <string name="app_description">Unless you are a professional DJ, chances are at some point you have had party guests over that get on your case for your taste in music. Everyone has their own preferences and no one wants to be left off the playlist. Guppy for Android ensures they never have to by letting everyone on a Bluetooth connection contribute.</string>
-    <string name="host_button_text">Host</string>
-    <string name="guest_button_text">Guest</string>
+
+    <string name="text_welcome_message">Welcome to Guppy!</string>
+    <string name="text_description">Unless you are a professional DJ, chances are at some point you have had party guests over that get on your case for your taste in music. Everyone has their own preferences and no one wants to be left off the songs. Guppy for Android ensures they never have to by letting everyone on a Bluetooth connection contribute.</string>
+    <string name="text_host_button">Host</string>
+    <string name="text_guest_button">Guest</string>
+
+    <string name="title_activity_playlist">PlaylistActivity</string>
+    <string name="title_playlist">Playlist</string>
+    <string name="text_load_playlist_menu_item">Load existing playlist</string>
+    <string name="text_save_playlist_menu_item">Save current playlist</string>
+
+
+    <string name="title_activity_song_picker">SongPickerActivity</string>
+    <string name="title_song_picker">Pick a song</string>
+
+    <string name="text_song_title">Song title</string>
+    <string name="text_song_url">Song URL</string>
 </resources>
