@@ -36,7 +36,7 @@ public class HostPlaylistPresenter extends PlaylistPresenter {
         return bluetoothManager.isBluetoothSupported();
     }
 
-    public void bluetoothNotSupported() {
+    public void onBluetoothNotSupported() {
         ((HostPlaylistView) getView()).showBluetoothNotSupportedDialog();
     }
 

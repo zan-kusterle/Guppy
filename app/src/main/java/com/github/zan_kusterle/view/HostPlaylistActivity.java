@@ -74,12 +74,11 @@ public class HostPlaylistActivity extends PlaylistActivity
         presenter.onConfigurationChanged();
 
         if (!((HostPlaylistPresenter) presenter).isBluetoothSupported()) {
-            ((HostPlaylistPresenter) presenter).bluetoothNotSupported();
+            ((HostPlaylistPresenter) presenter).onBluetoothNotSupported();
             return;
         }
 
         ((HostPlaylistPresenter) presenter).enableBluetoothDiscoverability();
-        ((HostPlaylistPresenter) presenter).acceptConnections();
     }
 
     @Override
@@ -135,6 +134,8 @@ public class HostPlaylistActivity extends PlaylistActivity
                     .create();
 
             dialog.show();
+        } else if (requestCode == REQUEST_ENABLE_DEVICE_DISCOVERABILITY && resultCode == 1) {
+            ((HostPlaylistPresenter) presenter).acceptConnections();
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
