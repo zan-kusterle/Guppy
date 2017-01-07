@@ -7,15 +7,14 @@ import java.util.List;
 import lombok.Getter;
 
 /**
- * Created by bencz on 2016. 12. 20..
+ * Created by bencz on 2017. 01. 07..
  */
-
 @Getter
-public class PlaylistChangedEvent {
+public class PlaylistLoadedEvent {
 
     private final List<Song> songs;
 
-    public PlaylistChangedEvent(List<Song> songs) {
+    public PlaylistLoadedEvent(List<Song> songs) {
         this.songs = songs;
     }
 }

@@ -17,6 +17,9 @@ import butterknife.OnClick;
 
 public class SongPickerActivity extends AppCompatActivity {
 
+    @BindView(R.id.songPickerToolbar)
+    public Toolbar songPickerToolbar;
+
     @BindView(R.id.songPickerWebView)
     public WebView songPickerWebView;
 
@@ -24,8 +27,7 @@ public class SongPickerActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_song_picker);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.songPickerToolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(songPickerToolbar);
 
         ButterKnife.bind(this);
 
@@ -55,7 +57,13 @@ public class SongPickerActivity extends AppCompatActivity {
 
         // Parse the song's title
         String songTitle = songPickerWebView.getTitle();
-        songTitle = songTitle.substring(0, songTitle.lastIndexOf(" - YouTube"));
+        int songTitleEndIndex = songTitle.lastIndexOf(" - YouTube");
+
+        // If the page is not loaded yet (the title is not set yet)
+        if (songTitleEndIndex == -1)
+            return;
+
+        songTitle = songTitle.substring(0, songTitleEndIndex);
 
         // Destroy audio/video objects
         songPickerWebView.loadUrl("about:blank");

@@ -6,9 +6,12 @@ import com.hannesdorfmann.mosby.mvp.MvpView;
 import java.util.List;
 
 /**
- * Created by bencz on 2016. 12. 08..
+ * Created by bencz on 2016. 12. 19..
  */
 
 public interface PlaylistView extends MvpView {
-    void setPlaylist(List<Song> playlist);
+    void setPlaylist(List<Song> songs);
+    void showRemovalConfirmationDialog(String songId);
+    void showToast(String message);
+    void showSaveDialog();
 }

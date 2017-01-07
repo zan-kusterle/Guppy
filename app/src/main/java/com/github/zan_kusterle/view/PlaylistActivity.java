@@ -1,73 +1,79 @@
 package com.github.zan_kusterle.view;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
+import android.support.v7.app.AppCompatDelegate;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ListView;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.Toast;
 
 import com.github.zan_kusterle.R;
 import com.github.zan_kusterle.model.Song;
-import com.github.zan_kusterle.model.SongsAdapter;
 import com.github.zan_kusterle.presenter.PlaylistPresenter;
 import com.hannesdorfmann.mosby.mvp.MvpActivity;
+import com.rustamg.filedialogs.FileDialog;
+import com.rustamg.filedialogs.SaveFileDialog;
 
+import java.io.File;
 import java.util.List;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.OnClick;
+/**
+ * Created by bencz on 2016. 12. 20..
+ */
 
-public class PlaylistActivity extends MvpActivity<PlaylistView, PlaylistPresenter>
-        implements PlaylistView {
+public abstract class PlaylistActivity extends MvpActivity<PlaylistView, PlaylistPresenter>
+        implements PlaylistView, AdapterView.OnItemLongClickListener, FileDialog.OnFileSelectedListener {
 
-    private static final int PLAYLIST_ACTIVITY_REQUEST_CODE = 1;
+    protected static final int REQUEST_ADD_SONG = 1;
 
-    @BindView(R.id.playlistListView)
-    public ListView playlistListView;
+    protected PlaylistAdapter playlistAdapter;
+
+    static {
+        AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
+    }
+
+    public abstract PlaylistPresenter createPresenter();
+
+    public abstract boolean onCreateOptionsMenu(Menu menu);
+
+    public abstract boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id);
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_playlist);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.playlistToolbar);
-        setSupportActionBar(toolbar);
-
-        ButterKnife.bind(this);
+    public void setPlaylist(List<Song> songs) {
+        playlistAdapter.setItems(songs);
     }
 
     @Override
-    public PlaylistPresenter createPresenter() {
-        return new PlaylistPresenter();
-    }
+    public void showRemovalConfirmationDialog(final String songId) {
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setTitle(R.string.text_song_removal_dialog_title)
+                .setMessage(R.string.text_song_removal_dialog_message)
+                .setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        presenter.removeSong(songId);
+                    }
+                })
+                .setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.dismiss();
+                    }
+                })
+                .create();
 
-    @OnClick(R.id.addSongFab)
-    public void onAddSongFabClick() {
-        startActivityForResult(new Intent(this, SongPickerActivity.class), PLAYLIST_ACTIVITY_REQUEST_CODE);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.playlist_menu, menu);
-
-        boolean isHost = getIntent().getBooleanExtra("isHost", false);
-        if (!isHost) {
-            menu.findItem(R.id.loadPlaylistMenuItem)
-                    .setVisible(false);
-        }
-
-        return true;
+        dialog.show();
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.loadPlaylistMenuItem:
-                presenter.loadPlaylist();
-                return true;
             case R.id.savePlaylistMenuItem:
-                presenter.savePlaylist();
+                presenter.onSavePlaylistClicked();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -75,14 +81,41 @@ public class PlaylistActivity extends MvpActivity<PlaylistView, PlaylistPresente
     }
 
     @Override
-    public void setPlaylist(List<Song> playlist) {
-        playlistListView.setAdapter(new SongsAdapter(this, playlist));
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        playlistAdapter = new PlaylistAdapter(this);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PLAYLIST_ACTIVITY_REQUEST_CODE && resultCode == RESULT_OK) {
-            getPresenter().addSong(data.getStringExtra("URL"), data.getStringExtra("title"));
+        if (requestCode == REQUEST_ADD_SONG && resultCode == RESULT_OK) {
+            presenter.addSong(data.getStringExtra("URL"), data.getStringExtra("title"));
         }
+    }
+
+    @Override
+    public void showToast(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_LONG)
+                .show();
+    }
+
+    @Override
+    public void showSaveDialog() {
+        showFileDialog(new SaveFileDialog(), SaveFileDialog.class.getName());
+    }
+
+    public abstract void onFileSelected(FileDialog dialog, File file);
+
+    protected void onAddSongFabClick() {
+        startActivityForResult(new Intent(this, SongPickerActivity.class), REQUEST_ADD_SONG);
+    }
+
+    protected void showFileDialog(FileDialog dialog, String tag) {
+        Bundle args = new Bundle();
+        args.putString(FileDialog.EXTENSION, ".gpl");
+        dialog.setArguments(args);
+        dialog.setStyle(android.support.v4.app.DialogFragment.STYLE_NO_TITLE, R.style.AppTheme);
+        dialog.show(getSupportFragmentManager(), tag);
     }
 }
